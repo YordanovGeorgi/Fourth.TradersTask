@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+*.user
+*.suo
+*.rsuser
+*.sln.iml
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
