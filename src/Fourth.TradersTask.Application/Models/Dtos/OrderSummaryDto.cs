@@ -17,4 +17,5 @@ public class OrderSummaryDto
         OrderDate = orderDate;
         TotalOrderValue = totalOrderValue;
         NumberOfProducts = numberOfProducts;
-    }}
+    }
+}

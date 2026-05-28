@@ -1,4 +1,5 @@
 using Fourth.TradersTask.Application.Abstractions;
+using Fourth.TradersTask.Application.Extensions;
 using Fourth.TradersTask.Application.Models;
 using Fourth.TradersTask.Application.Models.Dtos;
 using Microsoft.Extensions.Logging;
@@ -71,41 +72,11 @@ public class CustomerService : ICustomerService
             return null;
         }
 
-        var customerDetailDto = new CustomerDetailDto
-        {
-            CustomerId = customer.CustomerId,
-            CompanyName = customer.CompanyName,
-            ContactName = customer.ContactName,
-            ContactTitle = customer.ContactTitle,
-            Address = customer.Address,
-            City = customer.City,
-            Region = customer.Region,
-            PostalCode = customer.PostalCode,
-            Country = customer.Country,
-            Phone = customer.Phone,
-            Fax = customer.Fax,
-            Orders = customer.Orders
-                .OrderByDescending(o => o.OrderDate)
-                .Select(o => new OrderSummaryDto(
-                    o.OrderId,
-                    o.OrderDate,
-                    CalculateOrderTotal(o),
-                    o.OrderDetails.Count))
-                .ToList()
-        };
+        var customerDetailDto = customer.ToCustomerDetailDto();
 
         _logger.LogInformation("Successfully fetched customer details with {OrderCount} orders",
             customerDetailDto.Orders.Count);
 
         return customerDetailDto;
-    }
-
-    /// <summary>
-    /// Calculates the total value of an order from its order details.
-    /// </summary>
-    private static decimal CalculateOrderTotal(Domain.Order order)
-    {
-        return order.OrderDetails.Sum(od => 
-            od.UnitPrice * od.Quantity * (1 - (decimal)od.Discount));
     }
 }

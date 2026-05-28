@@ -1,11 +1,12 @@
-using Xunit;
-using Moq;
 using FluentAssertions;
-using Fourth.TradersTask.Application.Models;
-using Fourth.TradersTask.Application.Services;
 using Fourth.TradersTask.Application.Abstractions;
+using Fourth.TradersTask.Application.Models;
+using Fourth.TradersTask.Application.Models.Dtos;
+using Fourth.TradersTask.Application.Services;
 using Fourth.TradersTask.Domain;
 using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
 
 namespace Fourth.TradersTask.UnitTests;
 
@@ -39,7 +40,7 @@ public class CustomerServiceTests
 
         _mockRepository
             .Setup(r => r.GetCustomersAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((customers, 2));
+            .ReturnsAsync(new CustomerListDto { Customers = customers, TotalCount = 2 });
 
         var paginationParams = new PaginationParams { PageNumber = 1, PageSize = 10 };
 
@@ -69,7 +70,7 @@ public class CustomerServiceTests
 
         _mockRepository
             .Setup(r => r.GetCustomersAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((customers, 0));
+            .ReturnsAsync(new CustomerListDto { Customers = customers, TotalCount = 0 });
 
         var paginationParams = new PaginationParams { PageNumber = 1, PageSize = 10, CustomerName = searchTerm };
 
@@ -90,7 +91,7 @@ public class CustomerServiceTests
 
         _mockRepository
             .Setup(r => r.GetCustomersAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((customers, 25));
+            .ReturnsAsync(new CustomerListDto { Customers = customers, TotalCount = 25 });
 
         var paginationParams = new PaginationParams { PageNumber = 1, PageSize = 10 };
 
@@ -121,7 +122,7 @@ public class CustomerServiceTests
 
         _mockRepository
             .Setup(r => r.GetCustomersAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((customers, 1));
+            .ReturnsAsync(new CustomerListDto { Customers = customers, TotalCount = 1 });
 
         var paginationParams = new PaginationParams();
 
