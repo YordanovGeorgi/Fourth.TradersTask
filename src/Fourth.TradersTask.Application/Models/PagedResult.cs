@@ -18,6 +18,11 @@ public class PagedResult<T>
     /// <summary>
     /// Creates a new instance of PagedResult.
     /// </summary>
+    public PagedResult() { }
+
+    /// <summary>
+    /// Creates a new instance of PagedResult with parameters.
+    /// </summary>
     public PagedResult(int pageNumber, int pageSize, int totalCount, List<T> data)
     {
         PageNumber = pageNumber;

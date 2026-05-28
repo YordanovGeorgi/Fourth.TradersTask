@@ -1,3 +1,5 @@
+using Fourth.TradersTask.API.Constants;
+using Fourth.TradersTask.API.Validators;
 using Fourth.TradersTask.Application.Models;
 using Fourth.TradersTask.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +15,22 @@ public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly ILogger<CustomersController> _logger;
+    private readonly PaginationParamsValidator _paginationValidator;
+    private readonly CustomerIdValidator _customerIdValidator;
 
-    public CustomersController(ICustomerService customerService, ILogger<CustomersController> logger)
+    /// <summary>
+    /// Initializes a new instance of the CustomersController.
+    /// </summary>
+    public CustomersController(
+        ICustomerService customerService,
+        ILogger<CustomersController> logger,
+        PaginationParamsValidator paginationValidator,
+        CustomerIdValidator customerIdValidator)
     {
         _customerService = customerService;
         _logger = logger;
+        _paginationValidator = paginationValidator;
+        _customerIdValidator = customerIdValidator;
     }
 
     /// <summary>
@@ -31,28 +44,18 @@ public class CustomersController : ControllerBase
     /// <response code="200">Returns the paginated list of customers.</response>
     /// <response code="400">If pagination parameters are invalid.</response>
     [HttpGet]
+    [Produces("application/json")]
     public async Task<ActionResult<PagedResult<CustomerListItemDto>>> GetCustomers(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10,
+        [FromQuery] int pageNumber = ApiConstants.DefaultPageNumber,
+        [FromQuery] int pageSize = ApiConstants.DefaultPageSize,
         [FromQuery] string? customerName = null,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("GET /api/customers - Page: {PageNumber}, Size: {PageSize}, Search: {CustomerName}",
-            pageNumber, pageSize, customerName ?? "none");
+        _logger.LogInformation(
+            "GET /api/customers - Page: {PageNumber}, Size: {PageSize}, Search: {SearchTerm}",
+            pageNumber, pageSize, customerName ?? ApiConstants.CustomerName);
 
-        // Validation
-        if (pageNumber < 1)
-        {
-            _logger.LogWarning("Invalid pageNumber: {PageNumber}", pageNumber);
-            return BadRequest(new { message = "Page number must be greater than 0." });
-        }
-
-        if (pageSize < 1 || pageSize > 100)
-        {
-            _logger.LogWarning("Invalid pageSize: {PageSize}", pageSize);
-            return BadRequest(new { message = "Page size must be between 1 and 100." });
-        }
-
+        // Validate pagination parameters
         var paginationParams = new PaginationParams
         {
             PageNumber = pageNumber,
@@ -60,15 +63,24 @@ public class CustomersController : ControllerBase
             CustomerName = customerName
         };
 
-        var result = await _customerService.GetCustomersAsync(paginationParams, cancellationToken);
+        var validationResult = await _paginationValidator.ValidateAsync(paginationParams, cancellationToken);
 
-        if (result.TotalCount == 0)
+        if (!validationResult.IsValid)
         {
-            _logger.LogWarning("No customers found for the given parameters: {PaginationParams}", paginationParams);
-            return NotFound(new { message = "No customers found for the given parameters." });
+            _logger.LogWarning(
+                "Invalid pagination parameters: PageNumber={PageNumber}, PageSize={PageSize}",
+                pageNumber, pageSize);
+
+            return BadRequest(new ErrorResponse(
+                "One or more validation errors occurred.",
+                string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                "VALIDATION_ERROR"));
         }
 
-        _logger.LogInformation("Successfully retrieved {Count} customers out of {Total}",
+        var result = await _customerService.GetCustomersAsync(paginationParams, cancellationToken);
+
+        _logger.LogInformation(
+            "Successfully retrieved {Count} customers out of {Total}",
             result.Data.Count, result.TotalCount);
 
         return Ok(result);
@@ -81,26 +93,38 @@ public class CustomersController : ControllerBase
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Customer details with order summaries.</returns>
     /// <response code="200">Returns the customer details.</response>
+    /// <response code="400">If the customer ID is invalid.</response>
     /// <response code="404">If the customer is not found.</response>
     [HttpGet("details/{id}")]
+    [Produces("application/json")]
     public async Task<ActionResult<CustomerDetailDto>> GetCustomerDetail(
         string id,
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("GET /api/customers/details/{CustomerId}", id);
 
-        if (string.IsNullOrWhiteSpace(id))
+        // Validate customer ID
+        var validationResult = await _customerIdValidator.ValidateAsync(id ?? string.Empty, cancellationToken);
+
+        if (!validationResult.IsValid)
         {
-            _logger.LogWarning("Customer ID is null or empty");
-            return BadRequest(new { message = "Customer ID cannot be empty." });
+            _logger.LogWarning("Invalid customer ID");
+            return BadRequest(new ErrorResponse(
+                ApiConstants.EmptyCustomerIdMessage,
+                null,
+                "INVALID_CUSTOMER_ID"));
         }
 
         var customer = await _customerService.GetCustomerDetailAsync(id.Trim(), cancellationToken);
 
         if (customer is null)
         {
-            _logger.LogWarning("Customer not found: {CustomerId}", id);
-            return NotFound(new { message = $"Customer with ID '{id}' not found." });
+            var customerId = id.Trim();
+            _logger.LogWarning("Customer not found: {CustomerId}", customerId);
+            return NotFound(new ErrorResponse(
+                string.Format(ApiConstants.CustomerNotFoundMessage, customerId),
+                null,
+                "CUSTOMER_NOT_FOUND"));
         }
 
         _logger.LogInformation("Successfully retrieved customer details for {CustomerId}", id);

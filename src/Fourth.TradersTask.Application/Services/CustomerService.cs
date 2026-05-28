@@ -34,12 +34,10 @@ public class CustomerService : ICustomerService
             paginationParams.CustomerName,
             cancellationToken);
 
-        var dtos = customers.Select(c => new CustomerListItemDto
-        {
-            CustomerId = c.CustomerId,
-            CompanyName = c.CompanyName,
-            NumberOfOrders = c.Orders.Count
-        }).ToList();
+        var dtos = customers.Select(c => new CustomerListItemDto(
+            c.CustomerId,
+            c.CompanyName,
+            c.Orders.Count)).ToList();
 
         _logger.LogInformation("Successfully fetched {Count} customers", dtos.Count);
 
@@ -67,7 +65,6 @@ public class CustomerService : ICustomerService
             return null;
         }
 
-        // Map to DTO with order summaries
         var customerDetailDto = new CustomerDetailDto
         {
             CustomerId = customer.CustomerId,
@@ -83,13 +80,11 @@ public class CustomerService : ICustomerService
             Fax = customer.Fax,
             Orders = customer.Orders
                 .OrderByDescending(o => o.OrderDate)
-                .Select(o => new OrderSummaryDto
-                {
-                    OrderId = o.OrderId,
-                    OrderDate = o.OrderDate,
-                    TotalOrderValue = CalculateOrderTotal(o),
-                    NumberOfProducts = o.OrderDetails.Count
-                })
+                .Select(o => new OrderSummaryDto(
+                    o.OrderId,
+                    o.OrderDate,
+                    CalculateOrderTotal(o),
+                    o.OrderDetails.Count))
                 .ToList()
         };
 

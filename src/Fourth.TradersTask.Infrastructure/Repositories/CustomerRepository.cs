@@ -30,10 +30,10 @@ public class CustomerRepository : ICustomerRepository
         // Apply search filter
         query = AddSearchByCustomerName(customerName, query);
 
-        // Get total count
+        // Get total count from filtered query
         var totalCount = await query.CountAsync(cancellationToken);
 
-        // Calculate skip and apply pagination
+        // Calculate skip and apply pagination with includes
         var skip = (pageNumber - 1) * pageSize;
         var customers = await query
             .Include(c => c.Orders)
@@ -63,7 +63,7 @@ public class CustomerRepository : ICustomerRepository
         if (!string.IsNullOrWhiteSpace(customerName))
         {
             var term = customerName.Trim();
-            query = query.Where(c => c.CompanyName.Contains(term) || c.ContactName!.Contains(term));
+            query = query.Where(c => c.CompanyName.Contains(term));
         }
 
         return query;
