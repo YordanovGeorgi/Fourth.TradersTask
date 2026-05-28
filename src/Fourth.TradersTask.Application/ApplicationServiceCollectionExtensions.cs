@@ -1,3 +1,4 @@
+using Fourth.TradersTask.Application.Abstractions;
 using Fourth.TradersTask.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 

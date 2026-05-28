@@ -1,4 +1,5 @@
 using Fourth.TradersTask.Application.Abstractions;
+using Fourth.TradersTask.Application.Models.Dtos;
 using Fourth.TradersTask.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public class CustomerRepository : ICustomerRepository
     /// <summary>
     /// Gets customers with pagination and optional search.
     /// </summary>
-    public async Task<(List<Customer> Items, int TotalCount)> GetCustomersAsync(
+    public async Task<CustomerListDto> GetCustomersAsync(
         int pageNumber,
         int pageSize,
         string? customerName,
@@ -42,7 +43,11 @@ public class CustomerRepository : ICustomerRepository
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return (customers, totalCount);
+        return new CustomerListDto
+        {
+            Customers = customers,
+            TotalCount = totalCount
+        };
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using Fourth.TradersTask.Application.Models.Dtos;
 using Fourth.TradersTask.Domain;
 
 namespace Fourth.TradersTask.Application.Abstractions;
@@ -10,7 +11,7 @@ public interface ICustomerRepository
     /// <summary>
     /// Gets customers with pagination and search support.
     /// </summary>
-    Task<(List<Customer> Items, int TotalCount)> GetCustomersAsync(
+    Task<CustomerListDto> GetCustomersAsync(
         int pageNumber,
         int pageSize,
         string? searchTerm,

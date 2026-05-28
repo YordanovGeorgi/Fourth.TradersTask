@@ -1,4 +1,4 @@
-namespace Fourth.TradersTask.Application.Models;
+namespace Fourth.TradersTask.Application.Models.Dtos;
 
 /// <summary>
 /// Response DTO for order summary information.

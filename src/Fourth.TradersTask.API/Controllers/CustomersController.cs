@@ -1,7 +1,9 @@
 using Fourth.TradersTask.API.Constants;
+using Fourth.TradersTask.Application.Abstractions;
 using Fourth.TradersTask.Application.Models;
-using Fourth.TradersTask.Application.Services;
+using Fourth.TradersTask.Application.Models.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Fourth.TradersTask.API.Controllers;
 
@@ -72,7 +74,7 @@ public class CustomersController : ControllerBase
     [HttpGet("details/{id}")]
     [Produces("application/json")]
     public async Task<ActionResult<CustomerDetailDto>> GetCustomerDetail(
-        string id,
+        [Required] string id,
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("GET /api/customers/details/{CustomerId}", id);

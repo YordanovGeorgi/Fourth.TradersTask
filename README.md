@@ -73,8 +73,8 @@ GET /api/customers?pageNumber=1&pageSize=10&searchTerm=company
 {
   "pageNumber": 1,
   "pageSize": 10,
-  "totalCount": 91,
-  "totalPages": 10,
+  "totalCount": 1,
+  "totalPages": 1,
   "data": [
     {
       "customerId": "ALFKI",

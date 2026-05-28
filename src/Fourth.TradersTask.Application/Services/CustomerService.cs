@@ -1,5 +1,6 @@
 using Fourth.TradersTask.Application.Abstractions;
 using Fourth.TradersTask.Application.Models;
+using Fourth.TradersTask.Application.Models.Dtos;
 using Microsoft.Extensions.Logging;
 
 namespace Fourth.TradersTask.Application.Services;
@@ -33,13 +34,13 @@ public class CustomerService : ICustomerService
         _logger.LogInformation("Fetching customers with page {PageNumber}, size {PageSize}, search term: {SearchTerm}",
             paginationParams.PageNumber, paginationParams.PageSize, paginationParams.CustomerName ?? "none");
 
-        var (customers, totalCount) = await _customerRepository.GetCustomersAsync(
+        var result = await _customerRepository.GetCustomersAsync(
             paginationParams.PageNumber,
             paginationParams.PageSize,
             paginationParams.CustomerName,
             cancellationToken);
 
-        var dtos = customers.Select(c => new CustomerListItemDto(
+        var dtos = result.Customers.Select(c => new CustomerListItemDto(
             c.CustomerId,
             c.CompanyName,
             c.Orders.Count)).ToList();
@@ -49,7 +50,7 @@ public class CustomerService : ICustomerService
         return new PagedResult<CustomerListItemDto>(
             paginationParams.PageNumber,
             paginationParams.PageSize,
-            totalCount,
+            result.TotalCount,
             dtos);
     }
 

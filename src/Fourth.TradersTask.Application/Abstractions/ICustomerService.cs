@@ -1,6 +1,7 @@
 using Fourth.TradersTask.Application.Models;
+using Fourth.TradersTask.Application.Models.Dtos;
 
-namespace Fourth.TradersTask.Application.Services;
+namespace Fourth.TradersTask.Application.Abstractions;
 
 /// <summary>
 /// Service interface for customer operations.
