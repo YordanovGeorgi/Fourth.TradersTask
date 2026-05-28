@@ -21,7 +21,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
     #region GET /api/customers Tests
 
     [Fact]
-    public async Task GetCustomers_WithoutDatabase_ReturnsSuccess()
+    public async Task GetCustomers_WithoutQueryParameters_ReturnsBadRequest()
     {
         // Act
         var response = await _client.GetAsync("/api/customers");
@@ -29,7 +29,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
         // Assert
         // Note: This will fail if database is not configured, which is expected
         // In a real scenario with test database, this would verify the endpoint structure
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class CustomersControllerIntegrationTests : IClassFixture<WebApplicationF
     public async Task GetCustomers_WithValidRequest_ReturnsOkStatusCode()
     {
         // Act
-        var response = await _client.GetAsync("/api/customers");
+        var response = await _client.GetAsync("/api/customers?pageNumber=1&pageSize=10&customerName=ALFKI");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -1,5 +1,4 @@
 using Fourth.TradersTask.API.Constants;
-using Fourth.TradersTask.API.Validators;
 using Fourth.TradersTask.Application.Models;
 using Fourth.TradersTask.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,30 +14,22 @@ public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly ILogger<CustomersController> _logger;
-    private readonly PaginationParamsValidator _paginationValidator;
-    private readonly CustomerIdValidator _customerIdValidator;
 
     /// <summary>
     /// Initializes a new instance of the CustomersController.
     /// </summary>
     public CustomersController(
         ICustomerService customerService,
-        ILogger<CustomersController> logger,
-        PaginationParamsValidator paginationValidator,
-        CustomerIdValidator customerIdValidator)
+        ILogger<CustomersController> logger)
     {
         _customerService = customerService;
         _logger = logger;
-        _paginationValidator = paginationValidator;
-        _customerIdValidator = customerIdValidator;
     }
 
     /// <summary>
     /// Gets a paginated list of customers with optional search filtering.
     /// </summary>
-    /// <param name="pageNumber">The page number (default 1).</param>
-    /// <param name="pageSize">The number of items per page (default 10, max 100).</param>
-    /// <param name="customerName">Optional search term to filter by company name or contact name.</param>
+    /// <param name="queryParameters">The query parameters for pagination and filtering.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Paginated list of customers.</returns>
     /// <response code="200">Returns the paginated list of customers.</response>
@@ -46,36 +37,19 @@ public class CustomersController : ControllerBase
     [HttpGet]
     [Produces("application/json")]
     public async Task<ActionResult<PagedResult<CustomerListItemDto>>> GetCustomers(
-        [FromQuery] int pageNumber = ApiConstants.DefaultPageNumber,
-        [FromQuery] int pageSize = ApiConstants.DefaultPageSize,
-        [FromQuery] string? customerName = null,
+        [FromQuery] GetCustomersQueryParameters queryParameters,
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(
             "GET /api/customers - Page: {PageNumber}, Size: {PageSize}, Search: {SearchTerm}",
-            pageNumber, pageSize, customerName ?? ApiConstants.CustomerName);
+            queryParameters.PageNumber, queryParameters.PageSize, queryParameters.CustomerName ?? ApiConstants.CustomerName);
 
-        // Validate pagination parameters
         var paginationParams = new PaginationParams
         {
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            CustomerName = customerName
+            PageNumber = queryParameters.PageNumber,
+            PageSize = queryParameters.PageSize,
+            CustomerName = queryParameters.CustomerName
         };
-
-        var validationResult = await _paginationValidator.ValidateAsync(paginationParams, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning(
-                "Invalid pagination parameters: PageNumber={PageNumber}, PageSize={PageSize}",
-                pageNumber, pageSize);
-
-            return BadRequest(new ErrorResponse(
-                "One or more validation errors occurred.",
-                string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                "VALIDATION_ERROR"));
-        }
 
         var result = await _customerService.GetCustomersAsync(paginationParams, cancellationToken);
 
@@ -103,18 +77,6 @@ public class CustomersController : ControllerBase
     {
         _logger.LogInformation("GET /api/customers/details/{CustomerId}", id);
 
-        // Validate customer ID
-        var validationResult = await _customerIdValidator.ValidateAsync(id ?? string.Empty, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Invalid customer ID");
-            return BadRequest(new ErrorResponse(
-                ApiConstants.EmptyCustomerIdMessage,
-                null,
-                "INVALID_CUSTOMER_ID"));
-        }
-
         var customer = await _customerService.GetCustomerDetailAsync(id.Trim(), cancellationToken);
 
         if (customer is null)
@@ -132,3 +94,4 @@ public class CustomersController : ControllerBase
         return Ok(customer);
     }
 }
+

@@ -12,6 +12,11 @@ public class CustomerService : ICustomerService
     private readonly ICustomerRepository _customerRepository;
     private readonly ILogger<CustomerService> _logger;
 
+    /// <summary>
+    /// Constructor for CustomerService.
+    /// </summary>
+    /// <param name="customerRepository"></param>
+    /// <param name="logger"></param>
     public CustomerService(ICustomerRepository customerRepository, ILogger<CustomerService> logger)
     {
         _customerRepository = customerRepository;

@@ -1,7 +1,10 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Fourth.TradersTask.API.Constants;
 using Fourth.TradersTask.API.Middleware;
 using Fourth.TradersTask.API.Validators;
 using Fourth.TradersTask.Application;
+using Fourth.TradersTask.Application.Models;
 using Fourth.TradersTask.Infrastructure;
 using Microsoft.OpenApi.Models;
 
@@ -22,9 +25,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddFluentValidationAutoValidation();
+
 // Add validation
-builder.Services.AddScoped<PaginationParamsValidator>();
-builder.Services.AddScoped<CustomerIdValidator>();
+builder.Services.AddScoped<IValidator<GetCustomersQueryParameters>, QueryParametersValidator>();
 
 // Configure Swagger/OpenAPI
 builder.Services.AddSwaggerGen(options =>
@@ -42,11 +46,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     // Include XML comments for documentation
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
+    var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+
+    foreach (var xmlFile in xmlFiles)
     {
-        options.IncludeXmlComments(xmlPath);
+        options.IncludeXmlComments(xmlFile);
     }
 });
 
@@ -98,5 +102,7 @@ app.Logger.LogInformation(
 
 await app.RunAsync();
 
-// Make Program visible for integration tests
+/// <summary>
+/// Make Program visible for integration tests
+/// </summary>
 public partial class Program { }
