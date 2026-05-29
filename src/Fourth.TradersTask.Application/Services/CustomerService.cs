@@ -34,7 +34,7 @@ public class CustomerService : ICustomerService
     {
         _logger.LogInformation("Fetching customers with page {PageNumber}, size {PageSize}, search term: {SearchTerm}",
             paginationParams.PageNumber, paginationParams.PageSize, paginationParams.CustomerName ?? "none");
-
+        
         var result = await _customerRepository.GetCustomersAsync(
             paginationParams.PageNumber,
             paginationParams.PageSize,

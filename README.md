@@ -14,7 +14,7 @@ The solution expects a Northwind database. Set up options:
 
 **Using Northwind Sample Database**
 1. Download the Northwind SQL script from Microsoft
-https://github.com/Microsoft/sql-server-samples/tree/master/samples/databases/northwind-pubs
+https://github.com/Microsoft/sql-server-samples/tree/master/samples/databases/northwind-pubs or use instnwnd.sql file added in folder Fourth.TradersTask
 2. Execute against your SQL Server instance
 3. Update connection string in `appsettings.json`
 

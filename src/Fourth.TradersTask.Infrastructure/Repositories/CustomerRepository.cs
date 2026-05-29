@@ -1,18 +1,18 @@
-using Fourth.TradersTask.Application.Abstractions;
 using Fourth.TradersTask.Application.Models.Dtos;
 using Fourth.TradersTask.Domain;
 using Microsoft.EntityFrameworkCore;
+using Fourth.TradersTask.Application.Abstractions;
 
 namespace Fourth.TradersTask.Infrastructure.Repositories;
 
 /// <summary>
 /// Implementation of customer repository using Entity Framework Core.
 /// </summary>
-public class CustomerRepository : ICustomerRepository
+public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
 {
     private readonly Data.NorthwindDbContext _dbContext;
 
-    public CustomerRepository(Data.NorthwindDbContext dbContext)
+    public CustomerRepository(Data.NorthwindDbContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
     }
@@ -29,7 +29,11 @@ public class CustomerRepository : ICustomerRepository
         var query = _dbContext.Customers.AsQueryable();
 
         // Apply search filter
-        query = AddSearchByCustomerName(customerName, query);
+        if (!string.IsNullOrWhiteSpace(customerName))
+        {
+            var term = customerName.Trim();
+            query = query.Where(c => c.CompanyName.Contains(term));
+        }
 
         // Get total count from filtered query
         var totalCount = await query.CountAsync(cancellationToken);
@@ -61,16 +65,5 @@ public class CustomerRepository : ICustomerRepository
             .Include(c => c.Orders)
             .ThenInclude(o => o.OrderDetails)
             .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
-    }
-
-    private static IQueryable<Customer> AddSearchByCustomerName(string? customerName, IQueryable<Customer> query)
-    {
-        if (!string.IsNullOrWhiteSpace(customerName))
-        {
-            var term = customerName.Trim();
-            query = query.Where(c => c.CompanyName.Contains(term));
-        }
-
-        return query;
     }
 }
