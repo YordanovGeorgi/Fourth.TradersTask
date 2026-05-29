@@ -60,7 +60,7 @@ dotnet test -v n
 ### Get Customers List
 
 ```http
-GET /api/customers?pageNumber=1&pageSize=10&searchTerm=company
+GET /api/customers?pageNumber=1&pageSize=10&searchTerm=Alfreds%20Futterkiste
 ```
 
 **Parameters:**
