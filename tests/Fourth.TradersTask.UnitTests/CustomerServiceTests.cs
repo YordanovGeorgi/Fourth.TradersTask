@@ -54,7 +54,7 @@ public class CustomerServiceTests
         result.TotalCount.Should().Be(2);
         result.Data.Should().HaveCount(2);
         result.Data[0].CustomerId.Should().Be("CUST1");
-        result.Data[0].CompanyName.Should().Be("Company 1");
+        result.Data[0].CustomerName.Should().Be("Company 1");
 
         _mockRepository.Verify(
             r => r.GetCustomersAsync(1, 10, null, It.IsAny<CancellationToken>()),

@@ -78,7 +78,7 @@ GET /api/customers?pageNumber=1&pageSize=10&searchTerm=Alfreds%20Futterkiste
   "data": [
     {
       "customerId": "ALFKI",
-      "companyName": "Alfreds Futterkiste",
+      "customerName": "Alfreds Futterkiste",
       "numberOfOrders": 6
     }
   ]
@@ -115,9 +115,39 @@ GET /api/customers/{id}
   "fax": "030-0076545",
   "orders": [
     {
+      "orderId": 11011,
+      "orderDate": "1998-04-09T00:00:00",
+      "totalOrderValue": 933.5,
+      "numberOfProducts": 2
+    },
+    {
+      "orderId": 10952,
+      "orderDate": "1998-03-16T00:00:00",
+      "totalOrderValue": 471.2,
+      "numberOfProducts": 2
+    },
+    {
+      "orderId": 10835,
+      "orderDate": "1998-01-15T00:00:00",
+      "totalOrderValue": 845.8,
+      "numberOfProducts": 2
+    },
+    {
+      "orderId": 10702,
+      "orderDate": "1997-10-13T00:00:00",
+      "totalOrderValue": 330,
+      "numberOfProducts": 2
+    },
+    {
+      "orderId": 10692,
+      "orderDate": "1997-10-03T00:00:00",
+      "totalOrderValue": 878,
+      "numberOfProducts": 1
+    },
+    {
       "orderId": 10643,
-      "orderDate": "2023-08-25T00:00:00",
-      "totalOrderValue": 3200.00,
+      "orderDate": "1997-08-25T00:00:00",
+      "totalOrderValue": 814.5,
       "numberOfProducts": 3
     }
   ]

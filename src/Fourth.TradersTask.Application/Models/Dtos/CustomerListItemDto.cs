@@ -6,15 +6,15 @@ namespace Fourth.TradersTask.Application.Models.Dtos;
 public class CustomerListItemDto
 {
     public string CustomerId { get; set; } = string.Empty;
-    public string CompanyName { get; set; } = string.Empty;
+    public string CustomerName { get; set; } = string.Empty;
     public int NumberOfOrders { get; set; }
 
     public CustomerListItemDto() { }
 
-    public CustomerListItemDto(string customerId, string companyName, int numberOfOrders)
+    public CustomerListItemDto(string customerId, string customerName, int numberOfOrders)
     {
         CustomerId = customerId;
-        CompanyName = companyName;
+        CustomerName = customerName;
         NumberOfOrders = numberOfOrders;
     }
 }
