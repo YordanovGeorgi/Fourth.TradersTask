@@ -19,7 +19,7 @@ public class UnitOfWork : IUnitOfWork
         var type = typeof(T);
         var repo = (IRepository<T>)_repositories.GetOrAdd(type, _ =>
         {
-            return new GenericRepository<T>(_context);
+            return new Repository<T>(_context);
         });
 
         return repo;

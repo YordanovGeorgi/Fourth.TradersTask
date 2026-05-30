@@ -1,20 +1,19 @@
+using Fourth.TradersTask.Application.Abstractions;
 using Fourth.TradersTask.Application.Models.Dtos;
 using Fourth.TradersTask.Domain;
+using Fourth.TradersTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Fourth.TradersTask.Application.Abstractions;
 
 namespace Fourth.TradersTask.Infrastructure.Repositories;
 
 /// <summary>
 /// Implementation of customer repository using Entity Framework Core.
 /// </summary>
-public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
+public class CustomerRepository : Repository<Customer>, ICustomerRepository
 {
-    private readonly Data.NorthwindDbContext _dbContext;
-
-    public CustomerRepository(Data.NorthwindDbContext dbContext) : base(dbContext)
+    public CustomerRepository(NorthwindDbContext dbContext) 
+        : base(dbContext)
     {
-        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -26,7 +25,7 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
         string? customerName,
         CancellationToken cancellationToken = default)
     {
-        var query = _dbContext.Customers.AsQueryable();
+        var query = Query();
 
         // Apply search filter
         if (!string.IsNullOrWhiteSpace(customerName))
@@ -61,7 +60,7 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
         string customerId,
         CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Customers
+        return await Query()
             .Include(c => c.Orders)
             .ThenInclude(o => o.OrderDetails)
             .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);

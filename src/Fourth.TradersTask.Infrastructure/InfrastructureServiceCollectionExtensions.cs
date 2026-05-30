@@ -27,7 +27,7 @@ public static class InfrastructureServiceCollectionExtensions
                 options.UseSqlServer(connectionString));
 
         // Register open-generic repository
-        services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         // Register unit of work using the DbContext
         services.AddScoped<IUnitOfWork, UnitOfWork>(sp =>
